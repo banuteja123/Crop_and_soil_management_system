@@ -1,0 +1,99 @@
+import random
+import numpy as np
+crops = {
+    'Wheat': {'soil_ph': (5.5, 7.0), 'temp': (12, 25), 'moisture': (20, 60), 'sunlight': (6, 8), 'rainfall': (30, 60)},
+    'Rice': {'soil_ph': (6.0, 7.5), 'temp': (20, 30), 'moisture': (70, 100), 'sunlight': (4, 6), 'rainfall': (120, 150)},
+    'Maize': {'soil_ph': (5.8, 7.2), 'temp': (18, 27), 'moisture': (40, 80), 'sunlight': (8, 10), 'rainfall': (60, 100)},
+    'Barley': {'soil_ph': (6.0, 7.0), 'temp': (10, 24), 'moisture': (30, 70), 'sunlight': (6, 8), 'rainfall': (40, 70)},
+}
+disease_database = {
+    'Wheat': [
+        {'name': 'Rust', 'symptoms': ['Yellow-orange pustules', 'Leaf wilting'], 'severity': 'High'},
+        {'name': 'Blight', 'symptoms': ['Black lesions', 'Plant wilting'], 'severity': 'Medium'}
+    ],
+    'Rice': [
+        {'name': 'Blast', 'symptoms': ['Grayish spots', 'Leaf necrosis'], 'severity': 'High'},
+        {'name': 'Sheath Blight', 'symptoms': ['Irregular lesions', 'Stem rot'], 'severity': 'Medium'}
+    ],
+    'Maize': [
+        {'name': 'Downy Mildew', 'symptoms': ['White downy growth', 'Leaf twisting'], 'severity': 'High'},
+        {'name': 'Bacterial Wilt', 'symptoms': ['Wilting', 'Yellow streaks'], 'severity': 'Low'}
+    ],
+    'Barley': [
+        {'name': 'Scald', 'symptoms': ['Water-soaked lesions', 'Leaf blight'], 'severity': 'Medium'},
+        {'name': 'Powdery Mildew', 'symptoms': ['White powdery spots', 'Leaf curling'], 'severity': 'Low'}
+    ],
+}
+
+def recommend_crop(soil_ph, temp, moisture, sunlight, rainfall):
+    recommendations = []
+    for crop, conditions in crops.items():
+        if (conditions['soil_ph'][0] <= soil_ph <= conditions['soil_ph'][1] and
+            conditions['temp'][0] <= temp <= conditions['temp'][1] and
+            conditions['moisture'][0] <= moisture <= conditions['moisture'][1] and
+            conditions['sunlight'][0] <= sunlight <= conditions['sunlight'][1] and
+            conditions['rainfall'][0] <= rainfall <= conditions['rainfall'][1]):
+            recommendations.append(crop)
+    return recommendations
+
+def recommend_fertilizer(soil_ph, nitrogen, phosphorus, potassium):
+    if soil_ph < 5.5:
+        return "Lime to increase pH"
+    elif soil_ph > 7.0:
+        return "Sulfur to decrease pH"
+    elif nitrogen < 50:
+        return "High Nitrogen Fertilizer"
+    elif phosphorus < 30:
+        return "High Phosphorus Fertilizer"
+    elif potassium < 20:
+        return "High Potassium Fertilizer"
+    else:
+        return "Balanced NPK Fertilizer"
+
+def identify_disease(crop_name, symptoms):
+    possible_diseases = []
+    if crop_name in disease_database:
+        for disease in disease_database[crop_name]:
+            matching_symptoms = set(disease['symptoms']).intersection(set(symptoms))
+            if matching_symptoms:
+                possible_diseases.append((disease['name'], disease['severity'], len(matching_symptoms)))
+    if possible_diseases:
+        possible_diseases.sort(key=lambda x: (-x[2], x[1])) 
+        return possible_diseases[0]
+    else:
+        return "No matching disease found."
+
+def main():
+    print("Welcome to the Advanced Crop and Soil Management System")
+    print("\n=== Crop Recommendation ===")
+    soil_ph = float(input("Enter soil pH level: "))
+    temp = float(input("Enter temperature (°C): "))
+    moisture = float(input("Enter soil moisture percentage: "))
+    sunlight = float(input("Enter sunlight hours per day: "))
+    rainfall = float(input("Enter rainfall in mm: "))
+    recommended_crops = recommend_crop(soil_ph, temp, moisture, sunlight, rainfall)
+    if recommended_crops:
+        print(f"Recommended crops based on your inputs: {', '.join(recommended_crops)}")
+    else:
+        print("No suitable crops found for the given conditions.")
+
+    
+    print("\n=== Soil Management ===")
+    nitrogen = float(input("Enter Nitrogen level in the soil (mg/kg): "))
+    phosphorus = float(input("Enter Phosphorus level in the soil (mg/kg): "))
+    potassium = float(input("Enter Potassium level in the soil (mg/kg): "))
+    print(f"Recommended Fertilizer: {recommend_fertilizer(soil_ph, nitrogen, phosphorus, potassium)}")
+
+    
+    print("\n=== Disease Identification ===")
+    crop_name = input("Enter the crop name to check for diseases: ")
+    symptoms = input("Enter observed symptoms (comma-separated): ").split(', ')
+    disease_info = identify_disease(crop_name.capitalize(), symptoms)
+    if isinstance(disease_info, tuple):
+        disease, severity, _ = disease_info
+        print(f"Identified disease for {crop_name}: {disease} (Severity: {severity})")
+    else:
+        print(disease_info)
+
+if _name_ == "_main_":
+                                                                                      main()
